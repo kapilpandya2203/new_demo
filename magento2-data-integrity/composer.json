@@ -1,0 +1,23 @@
+{
+    "name": "salecto2/magento2-data-integrity",
+    "description": "A scanner and fixer for data integrity issues in magento",
+    "type": "magento2-module",
+    "require": {
+        "php": "~7.4.0||~8.1.0",
+        "magento/framework": "103.0.*",
+        "league/commonmark": "2.3.*"
+    },
+    "version": "1.2.0",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Salecto\\DataIntegrity\\": ""
+        }
+    }
+}

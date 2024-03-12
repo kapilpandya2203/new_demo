@@ -1,0 +1,20 @@
+{
+    "data_integrity_issues": {
+        "column": {
+            "issue_id": true,
+            "test_name": true,
+            "test_code": true,
+            "description": true,
+            "issue_data": true,
+            "selected_solution": true,
+            "status": true,
+            "checksum": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "UNIQUE": true
+        }
+    }
+}

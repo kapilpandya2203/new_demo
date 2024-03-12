@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="data_integrity_issues" resource="default" engine="innodb" comment="Data integrity issues">
+        <column xsi:type="int" name="issue_id" unsigned="true" nullable="false" identity="true" comment="ID of the issue"/>
+        <column xsi:type="varchar" name="test_name" nullable="false" length="255" comment="Data integrity test name"/>
+        <column xsi:type="varchar" name="test_code" nullable="false" length="255" comment="Data integrity test code"/>
+        <column xsi:type="mediumtext" name="description" nullable="false" comment="Issue description"/>
+        <column xsi:type="longtext" name="issue_data" nullable="false" comment="Data used to execute solution"/>
+        <column xsi:type="varchar" name="selected_solution" nullable="true" length="255"  comment="Selected solution code"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="255" comment="Issue status"/>
+        <column xsi:type="varchar" name="checksum" nullable="false" length="255" comment="Issue identifier"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Created at"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Updated at"/>
+        <constraint xsi:type="primary" referenceId="DATA_INTEGRITY_ISSUES_ISSUE_ID_PRIMARY_KEY">
+            <column name="issue_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="DATA_INTEGRITY_ISSUES_CHECKSUM_UNIQUE">
+            <column name="checksum" />
+        </constraint>
+    </table>
+</schema>
