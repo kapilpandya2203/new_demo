@@ -54,5 +54,8 @@
     <type name="Magento\Customer\Controller\Account\LoginPost">
         <plugin name="mpcustomerapproval_account_login_post" type="Mageplaza\CustomerApproval\Plugin\CustomerLoginPost" sortOrder="1"/>
     </type>
+    <type name="Mageplaza\CustomerApproval\Model\Config\Source\AttributeOptions">
+        <plugin name="override_getalloptions" type="Mageplaza\CustomerApproval\Plugin\AttributeOptionsPlugin" sortOrder="1"/>
+    </type>
     <preference for="Mageplaza\CustomerApproval\Api\ListApproveInterface" type="Mageplaza\CustomerApproval\Model\ListApprove"/>
 </config>
