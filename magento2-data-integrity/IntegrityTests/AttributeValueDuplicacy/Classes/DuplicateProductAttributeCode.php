@@ -8,6 +8,11 @@ use Magento\Catalog\Model\ProductRepository;
 use Magento\Eav\Model\Entity\Attribute; // Import the Attribute class
 use Magento\Store\Model\StoreManagerInterface; // Import StoreManagerInterface
 use Magento\Framework\Api\FilterBuilder;
+use Magento\Framework\App\State;
+use Magento\Eav\Model\ResourceModel\Entity\Attribute\CollectionFactory as AttributeCollectionFactory;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+
+
 
 class DuplicateProductAttributeCode
 {
@@ -16,19 +21,33 @@ class DuplicateProductAttributeCode
     protected ProductRepository $productRepository;
     protected StoreManagerInterface $storeManager;
     protected FilterBuilder $filterBuilder;
+    protected State $appState;
+    protected AttributeCollectionFactory $_attributeFactory;
+    protected ProductCollectionFactory $productCollectionFactory;
+
+
 
     public function __construct(
         ProductAttributeRepositoryInterface $productAttributeRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         ProductRepository $productRepository,
         StoreManagerInterface $storeManager,
-        FilterBuilder $filterBuilder // Add StoreManagerInterface dependency
+        State $appState,
+        FilterBuilder $filterBuilder, // Add StoreManagerInterface dependency
+        AttributeCollectionFactory $_attributeFactory,
+        ProductCollectionFactory $productCollectionFactory
+
+
     ) {
         $this->productAttributeRepository = $productAttributeRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->productRepository = $productRepository;
         $this->storeManager = $storeManager;
         $this->filterBuilder = $filterBuilder;
+        $this->appState = $appState;
+        $this->_attributeFactory = $_attributeFactory;
+        $this->productCollectionFactory = $productCollectionFactory;
+
     }
 
     /**
@@ -41,25 +60,24 @@ class DuplicateProductAttributeCode
         \Magento\Framework\App\ObjectManager::getInstance()->get('Psr\Log\LoggerInterface')->info("---------getDuplicateAttributesWithOptionsAndProductIds---------------");
 
         $duplicateAttributesData = [];
-        $filterSourceModel = $this->filterBuilder
-            ->setField(Attribute::SOURCE_MODEL)
-            ->setValue(array(null, 'Magento\Eav\Model\Entity\Attribute\Source\Table'))
-            ->setConditionType('in')
-            ->create();
+        $attributeCollection = $this->_attributeFactory->create();
+        $attributeCollection->addFieldToFilter(\Magento\Eav\Model\Entity\Attribute\Set::KEY_ENTITY_TYPE_ID, 4);
 
-        $filterFrontendInput = $this->filterBuilder
-            ->setField(Attribute::FRONTEND_INPUT)
-            ->setValue(array('multiselect', 'select'))
-            ->setConditionType('in')
-            ->create();
-        // Retrieve all product attributes
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilters([$filterSourceModel, $filterFrontendInput])
-            ->create();
-        // Retrieve attribute list
-        $attributeList = $this->productAttributeRepository->getList($searchCriteria)->getItems();
+        // $attributeInfo->addFieldToFilter(Attribute::SOURCE_MODEL, 'null', 'Magento\Eav\Model\Entity\Attribute\Source\Table', 'in');
+        $attributeCollection->addFieldToFilter('entity_type_id', 4)
+            ->addFieldToFilter('frontend_input', ['in' => ['select', 'multiselect']])
+            ->addFieldToFilter(
+                ['source_model', 'source_model'],
+                [
+                    ['null' => true],
+                    ['like' => 'Magento\Eav\Model\Entity\Attribute\Source\Table']
+                ]
+            );
+        $attributeList = $attributeCollection->getItems();
         foreach ($attributeList as $attribute) {
             $attributeCode = $attribute->getAttributeCode();
+            \Magento\Framework\App\ObjectManager::getInstance()->get('Psr\Log\LoggerInterface')->info(print_r($attributeCode, true));
+
             $options = $attribute->getSource()->getAllOptions(true, true);
 
             $optionDataByLabel = [];
@@ -68,19 +86,16 @@ class DuplicateProductAttributeCode
                 $optionId = $option['value'];
                 $optionDataByLabel[$optionLabel][$optionId] = $option['label'];
             }
+
             // Check for duplicate option values
             foreach ($optionDataByLabel as $optionData) {
-                \Magento\Framework\App\ObjectManager::getInstance()->get('Psr\Log\LoggerInterface')->info(print_r($optionData, true));
-
                 if (count($optionData) > 1) {
-                    // If duplicates found, add the attribute code, option label,
-                    // and option data (ID and label) to the list
                     $duplicateOptions = [];
                     foreach ($optionData as $optionId => $optionLabel) {
                         $productIds = [];
                         foreach ($this->storeManager->getStores() as $store) {
                             $storeId = $store->getId();
-                            $productIds[$storeId] = $this->getProductIdsForOption($attributeCode, $optionId, $storeId);
+                            $productIds[$storeId] = $this->getProductsByAttributeAndOption($attributeCode, $optionId, $storeId);
                         }
 
                         $duplicateOptions[$optionId] = [
@@ -90,7 +105,7 @@ class DuplicateProductAttributeCode
                     $duplicateAttributesData[] = [
                         'attribute_code' => $attributeCode,
                         'option_label' => $optionLabel,
-                        'option_id_with_product_ids' => $duplicateOptions
+                        'option_id_with_product_ids' =>  $duplicateOptions
                     ];
                 }
             }
@@ -99,36 +114,35 @@ class DuplicateProductAttributeCode
     }
 
     /**
-     * Get product IDs for a given attribute code and option ID.
+     * Get products with a specific attribute and option ID.
      *
      * @param string $attributeCode
      * @param int $optionId
-     * @param int $storeId
      * @return array
      */
-    protected function getProductIdsForOption(string $attributeCode, int $optionId, int $storeId): array
+    public function getProductsByAttributeAndOption(string $attributeCode, int $optionId, int $storeId): array
     {
         $productIds = [];
 
-        // Set store context
-        $this->storeManager->setCurrentStore($storeId);
+        try {
+            // Create product collection
+            $productCollection = $this->productCollectionFactory->create();
+            
+            // Add filters based on parameters
+            $productCollection->addAttributeToSelect('entity_id') // Only retrieve product IDs
+                ->addAttributeToFilter($attributeCode, ['eq' => $optionId])
+                ->setStoreId($storeId);
 
-        // Create search criteria to find products by attribute code and option ID
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter($attributeCode, $optionId, 'eq')
-            ->addFilter('store_id', $storeId, 'eq')
-            ->create();
-
-        // Retrieve products matching the search criteria
-        $productCollection = $this->productRepository->getList($searchCriteria);
-
-        // Iterate through each product to collect product IDs
-        foreach ($productCollection->getItems() as $product) {
-            $productIds[] = $product->getId();
+            // Retrieve product IDs
+            foreach ($productCollection as $product) {
+                $productIds[] = $product->getId();
+            }
+        } catch (\Exception $e) {
+            // Handle exception
+            \Magento\Framework\App\ObjectManager::getInstance()
+                ->get(\Psr\Log\LoggerInterface::class)
+                ->error("Error fetching products by attribute and option: " . $e->getMessage());
         }
-
-        // Reset store context to default
-        $this->storeManager->setCurrentStore(null);
 
         return $productIds;
     }
