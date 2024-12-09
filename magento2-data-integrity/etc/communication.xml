@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Communication/etc/communication.xsd">
+    <topic name="dataintegrity.issues.solve" request="Salecto\DataIntegrity\Api\Data\IntegrityIssuesInterface">
+        <handler name="dataintegrity.issues.solve" type="Salecto\DataIntegrity\Model\Consumer\IssuesConsumer" method="process" />
+    </topic>
+</config>

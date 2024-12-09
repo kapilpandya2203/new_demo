@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">solution_form.solution_form_data_source</item>
+            <item name="deps" xsi:type="string">solution_form.solution_form_data_source</item>
+        </item>
+        <item name="config" xsi:type="array">
+            <item name="dataScope" xsi:type="string">data</item>
+            <item name="namespace" xsi:type="string">solution_form</item>
+        </item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+           <button name="save" class="Salecto\DataIntegrity\Block\Adminhtml\Issues\BulkSolutions\ApplyButton"/>
+       </buttons>
+       <namespace>solution_form</namespace>
+       <dataScope>data</dataScope>
+       <deps>
+        <dep>solution_form.solution_form_data_source</dep>
+    </deps>
+</settings>
+<dataSource name="solution_form_data_source" component="Magento_Ui/js/form/provider">
+    <settings>
+        <submitUrl path="data_integrity/issues/singlesolutionapply"/>
+    </settings>
+    <dataProvider class="Salecto\DataIntegrity\Model\SingleSolution\DataProvider"
+      name="solution_form_data_source">
+      <settings>
+        <requestFieldName>issue_id</requestFieldName>
+        <primaryFieldName>issue_id</primaryFieldName>
+    </settings>
+</dataProvider>
+</dataSource>
+<htmlContent name="html_content">
+    <settings>
+        <additionalClasses>
+            <class name="html-content-class">true</class>
+        </additionalClasses>
+    </settings>
+    <block name="html_content_block" class="Salecto\DataIntegrity\Block\Adminhtml\Issues\SingleSolution">
+        <arguments>
+            <argument name="template" xsi:type="string">Salecto_DataIntegrity::solution.phtml</argument>
+        </arguments>
+    </block>
+</htmlContent>
+<fieldset name="fieldset" class="Salecto\DataIntegrity\Ui\Component\Form\Fieldset\SingleSolution">
+    <argument name="data" xsi:type="array">
+        <item name="config" xsi:type="array">
+            <item name="label" xsi:type="string" translate="true">Solution Selection</item>
+            <item name="sortOrder" xsi:type="number">1</item>
+        </item>
+    </argument>
+</fieldset>
+</form>

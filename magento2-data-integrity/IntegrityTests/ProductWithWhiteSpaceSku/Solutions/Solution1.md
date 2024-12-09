@@ -1,0 +1,1 @@
+This solution will trim the whitespace from the product's sku.

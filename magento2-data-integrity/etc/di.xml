@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="issue_listing_data_source" xsi:type="string">Salecto\DataIntegrity\Model\ResourceModel\IntegrityIssues\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Salecto\DataIntegrity\Model\ResourceModel\IntegrityIssues\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">data_integrity_issues</argument>
+            <argument name="resourceModel" xsi:type="string">Salecto\DataIntegrity\Model\ResourceModel\IntegrityIssues</argument>
+            <argument name="identifierName" xsi:type="string">issue_id</argument>
+        </arguments>
+    </virtualType>
+    <type name="Salecto\DataIntegrity\Model\IntegrityTests">
+        <arguments>
+            <argument name="tests" xsi:type="array">
+                <item name="product.without.website" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\ProductWithoutWebsiteSingleStore\Test</item>
+                <item name="product.with.url.path" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\ProductWithUrlPath\Test</item>
+                <item name="url.rewrite.wrong.store.id" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\UrlRewriteWrongStoreId\Test</item>
+                <item name="product.with.whitespace.sku" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\ProductWithWhiteSpaceSku\Test</item>
+                <item name="attr.with.duplicate.values" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\AttributeValueDuplicacy\Test</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Salecto\DataIntegrity\IntegrityTests\ProductWithoutWebsiteSingleStore\Test">
+        <arguments>
+            <argument name="solutions" xsi:type="array">
+                <item name="solution1" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\ProductWithoutWebsiteSingleStore\Solutions\Solution1</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Salecto\DataIntegrity\IntegrityTests\ProductWithUrlPath\Test">
+        <arguments>
+            <argument name="solutions" xsi:type="array">
+                <item name="solution1" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\ProductWithUrlPath\Solutions\Solution1</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Salecto\DataIntegrity\IntegrityTests\UrlRewriteWrongStoreId\Test">
+        <arguments>
+            <argument name="solutions" xsi:type="array">
+                <item name="solution1" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\UrlRewriteWrongStoreId\Solutions\Solution1</item>
+                <item name="solution2" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\UrlRewriteWrongStoreId\Solutions\Solution2</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Salecto\DataIntegrity\IntegrityTests\ProductWithWhiteSpaceSku\Test">
+        <arguments>
+            <argument name="solutions" xsi:type="array">
+                <item name="solution1" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\ProductWithWhiteSpaceSku\Solutions\Solution1</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Salecto\DataIntegrity\IntegrityTests\AttributeValueDuplicacy\Test">
+        <arguments>
+            <argument name="solutions" xsi:type="array">
+                <item name="solution1" xsi:type="object">Salecto\DataIntegrity\IntegrityTests\AttributeValueDuplicacy\Solutions\Solution1</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="data_integrity_tests_run" xsi:type="object">Salecto\DataIntegrity\Console\Command\DataIntegrityTests</item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="League\CommonMark\ConverterInterface" type="League\CommonMark\GithubFlavoredMarkdownConverter"/>
+    <preference for="Salecto\DataIntegrity\Api\Data\IntegrityIssuesInterface" type="Salecto\DataIntegrity\Model\IntegrityIssues"/>
+    <preference for="Salecto\DataIntegrity\Api\Data\IntegrityIssuesRepositoryInterface" type="Salecto\DataIntegrity\Model\IntegrityIssuesRepository"/>
+</config>

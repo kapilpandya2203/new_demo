@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">issue_listing.issue_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>issue_listing_columns</spinner>
+        <deps>
+            <dep>issue_listing.issue_listing_data_source</dep>
+        </deps>
+        <buttons>
+            <button name="apply_bulk_solutions"
+                    class="Salecto\DataIntegrity\Block\Adminhtml\Issues\Index\Button\ApplyBulkSolutions"/>
+        </buttons>
+    </settings>
+    <dataSource name="issue_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <storageConfig>
+                <param name="indexField" xsi:type="string">issue_id</param>
+            </storageConfig>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Salecto_DataIntegrity::data_integrity</aclResource>
+        <dataProvider class="Magento\Framework\View\Element\UiComponent\DataProvider\DataProvider"
+                      name="issue_listing_data_source">
+            <settings>
+                <requestFieldName>issue_id</requestFieldName>
+                <primaryFieldName>issue_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="issue_listing_columns">
+        <settings>
+            <childDefaults>
+                <param name="fieldAction" xsi:type="array">
+                    <item name="provider" xsi:type="string">issue_listing.issue_listing.issue_details</item>
+                    <item name="target" xsi:type="string">view</item>
+                    <item name="params" xsi:type="array">
+                        <item name="0" xsi:type="url" path="data_integrity/issues/view"/>
+                        <item name="1" xsi:type="string">${ $.$data.rowIndex }</item>
+                    </item>
+                </param>
+            </childDefaults>
+        </settings>
+        <column name="issue_id">
+            <settings>
+                <sortable>true</sortable>
+                <filter>textRange</filter>
+                <dataType>text</dataType>
+                <sorting>desc</sorting>
+                <label translate="true">Issue ID</label>
+            </settings>
+        </column>
+        <column name="test_code">
+            <settings>
+                <sortable>true</sortable>
+                <filter>text</filter>
+                <dataType>text</dataType>
+                <label translate="true">Test Code</label>
+            </settings>
+        </column>
+        <column name="description">
+            <settings>
+                <sortable>true</sortable>
+                <filter>text</filter>
+                <dataType>text</dataType>
+                <label translate="true">Description</label>
+            </settings>
+        </column>
+        <column name="status">
+            <settings>
+                <sortable>true</sortable>
+                <filter>text</filter>
+                <dataType>text</dataType>
+                <label translate="true">Status</label>
+            </settings>
+        </column>
+        <actionsColumn name="actions" class="Salecto\DataIntegrity\Ui\Component\Listing\Column\Actions">
+            <settings>
+                <label translate="true">Actions</label>
+            </settings>
+        </actionsColumn>
+    </columns>
+    <modal name="issue_detail" component="Salecto_DataIntegrity/js/modal/issue_details">
+        <settings>
+            <options>
+                <option name="title" xsi:type="string" translate="true">Issue Details</option>
+                <option name="modalClass" xsi:type="string">issue_details_modal</option>
+            </options>
+        </settings>
+    </modal>
+    <modal name="solution_form_modal">
+    <settings>
+        <options>
+            <option name="title" xsi:type="string" translate="true">Data Integrity - Solution</option>
+        </options>
+    </settings>
+    <insertForm name="solution_form_loader" >
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="taskModalProvider" xsi:type="string">${ $.parentName }</item>
+            </item>
+        </argument>
+        <settings>
+            <formSubmitType>false</formSubmitType>
+            <renderUrl path="mui/index/render_handle">
+                <param name="handle">data_integrity_issues_singlesolution</param>
+                <param name="buttons">1</param>
+            </renderUrl>
+            <loading>false</loading>
+            <toolbarContainer>${ $.parentName }</toolbarContainer>
+            <externalProvider>${ $.ns }.solution_form_data_source</externalProvider>
+            <ns>solution_form</ns>
+        </settings>
+    </insertForm>
+</modal>
+</listing>

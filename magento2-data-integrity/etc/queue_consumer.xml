@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Queue:etc/queue_consumer.xsd">
+    <consumer name="dataintegrity.issues.solve" queue="dataintegrity.issues.solve" connection="db" maxMessages="5"
+              consumerInstance="Magento\Framework\MessageQueue\Consumer"
+              handler="Salecto\DataIntegrity\Model\Consumer\IssuesConsumer::process"/>
+</config>

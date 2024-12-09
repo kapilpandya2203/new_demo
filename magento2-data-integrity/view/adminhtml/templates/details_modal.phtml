@@ -1,0 +1,31 @@
+<?php
+/* @var $block Magento\Framework\View\Element\Template */
+/* @var $test AbstractTest */
+/* @var $issue IntegrityIssues */
+/* @var $solutions AbstractSolution */
+
+use Salecto\DataIntegrity\Model\AbstractSolution;
+use Salecto\DataIntegrity\Model\AbstractTest;
+use Salecto\DataIntegrity\Model\IntegrityIssues;
+
+$test = $block->getTest();
+$issue = $block->getIssue();
+
+if ($test instanceof AbstractTest):
+    $solutions = $test->getSolutions();
+    ?>
+    <hr>
+    <h2> Test: <?= $test->getName() ?> ( <?= $test->getCode() ?> ) </h2>
+    <?= $test->getReadmeInHtml() ?>
+    <hr>
+    <h2> <?= __('Current Issue') ?> </h2>
+    <p> <?= $issue->getDescription() ?> </p>
+    <hr><h2> <?= __('Possible Solutions') ?>  </h2>
+<?php foreach ($solutions as $solution): ?>
+    <h3><?= $solution->getName() ?> ( <?= $solution->getCode() ?> )</h3>
+    <?= $solution->getReadmeInHtml() ?>
+<br>
+<?php endforeach; ?>
+<?php else:
+    echo __('Could not find the test - %1', $issue->getTestName());
+endif; ?>
